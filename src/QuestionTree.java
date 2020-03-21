@@ -44,9 +44,9 @@ public class QuestionTree {
         while(current.left != null && current.right != null){
             uI.println(current.data); // Ask question
             if(uI.nextBoolean()){
-                current = root.left;
+                current = current.left;
             }else{
-                current = root.right;
+                current = current.right;
             }
         }
         System.out.println(current.data);
@@ -61,17 +61,17 @@ public class QuestionTree {
             System.out.println("Type a yes/no question to distinguish your item from computer:");
             question += uI.nextLine();
             System.out.println("And what is the answer for your object?");
+
+            String placeholder = current.data;
             if (uI.nextBoolean()) {
-                current.left = new QTNode(theirAnswer, null, null);
-                current.right = new QTNode(current.data, null, null);
-                current.data = question;
-                totalGames++;
+                current.left = new QTNode(theirAnswer);
+                current.right = new QTNode(placeholder);
             } else {
-                current.right = new QTNode(theirAnswer, null, null);
-                current.left = new QTNode(current.data, null, null);
-                current.data = question;
-                totalGames++;
+                current.right = new QTNode(theirAnswer);
+                current.left = new QTNode(placeholder);
             }
+            current.data = question;
+            totalGames++;
         }
     }
 
@@ -105,29 +105,24 @@ public class QuestionTree {
     change games played/won.)
      */
     public void load(Scanner input) {
-        root = loadNode(input);
-    }
-
-    public QTNode loadNode(Scanner input){
-
-        String line = input.nextLine();
-        if (line.charAt(0) == 'A'){
-            return new QTNode(line);
-        } else {
-            return new QTNode(line, loadNode(input), loadNode(input));
+        while (input.hasNextLine()){
+            root = loadNode(input);
         }
     }
 
-    /*
-
-     */
-    public int totalGames(){
-        return totalGames;
+    private QTNode loadNode(Scanner input){
+            String data = input.nextLine();
+            QTNode nextNode = new QTNode(data);
+            if (data.charAt(0) == 'Q') {
+                nextNode.left = loadNode(input);
+                nextNode.right = loadNode(input);
+            }
+            return nextNode;
     }
 
-    /*
 
-     */
+    public int totalGames(){ return totalGames;}
+
     public int gamesWon(){
         return gamesWon;
     }
