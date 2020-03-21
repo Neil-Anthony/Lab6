@@ -1,0 +1,27 @@
+   if (root.left != null && root.right != null){ //If the node has children, it is a question.
+            uI.println(root.data);  // Print the question.
+            if(uI.nextBoolean()){ // If the answer is "yes".
+                root = root.left;
+            }else{
+                play(root.right);
+            }
+        } else { // Answers have no children.
+            ;
+            if (uI.nextBoolean()){ // "yes"
+                uI.println("I win again Lews Therin.");
+                gamesWon++;
+            } else { // "no"
+                uI.println("You win this time.");
+                uI.println("What was your object?");
+                object += uI.nextLine();
+                uI.println("What is a question that would distinguish your answer from mine?");
+                question += uI.nextLine();
+                uI.println("What is the answer for your object: ");
+                if (uI.nextBoolean()){
+                    root.right = new QuestionTreeNode(object, null, null);
+                } else {
+                    root.right = new QuestionTreeNode(object, null, null);
+                }
+
+            }
+        }
