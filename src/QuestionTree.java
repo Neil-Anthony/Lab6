@@ -105,7 +105,17 @@ public class QuestionTree {
     change games played/won.)
      */
     public void load(Scanner input) {
+        root = loadNode(input);
+    }
 
+    public QTNode loadNode(Scanner input){
+
+        String line = input.nextLine();
+        if (line.charAt(0) == 'A'){
+            return new QTNode(line);
+        } else {
+            return new QTNode(line, loadNode(input), loadNode(input));
+        }
     }
 
     /*
