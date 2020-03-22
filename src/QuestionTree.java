@@ -1,3 +1,11 @@
+/*
+Neil Miller
+Professor Darrell Criss
+CS 145 Winter 2020
+Purpose:    To construct a binary tree which will play a version of the game 20 questions
+            which will learn a new question from the user when it fails to guess correctly.
+ */
+
 import java.io.PrintStream;
 import java.util.Scanner;
 
@@ -8,38 +16,28 @@ public class QuestionTree {
     private QTNode root;
     private UserInterface uI;
 
-
     /*
-    In this constructor you should initialize your new question tree. You are passed an object representing
-    the user interface for input/output. Your tree will use this user interface for printing output messages
-    and asking questions in the game (see next page). Initially the tree starts out containing only a single
-    answer leaf node with the word "computer" in it. The tree will grow larger as games are played or as a
-    new tree is loaded with the load method described below.
+    Constructor:
+    Initializes new QuestionTree with one node containing "A: Computer"
+    Initializes the User Interface.
      */
     public QuestionTree(UserInterface ui){
-
         root = new QTNode("A: Computer", null, null);
         this.uI = ui;
-
     }
 
     /*
-    A call to this method should play one complete guessing game with the user, asking yes/no questions until reaching
-    an answer object to guess. A game begins with the root node of the tree and ends upon reaching an answer leaf node.
-    If the computer wins the game, print a message saying so. Otherwise your tree must ask the user what object he/she
-    was thinking of, a question to distinguish that object from the player's guess, and whether the player's object is
-    the yes or no answer for that question. The two boxed partial logs on the first page are examples of output from
-    single calls to play. All user input/output should be done through the UserInterface object passed to your tree's
-    constructor.
-    After the game is over, the provided client program will prompt the user whether or not to play again; this is not
-    part of your play method. Leave this functionality to the client program.
+    Runs a round of the game.
+    Start at the root.
+    While the current node has children:
+        print node.data (a question)
+        Traverse left or right determined by the user.
+    Once we reach a leaf (a node with no children):
+        Print data (An answer).
+        Ask if it was right or wrong, if wrong get a new question from the user, if right win.
      */
 
     public void play(){
-        String question = "Q: ";
-        String answer = "A: ";
-        String theirAnswer = "A: ";
-        Boolean left = true;
         QTNode current = root;
         while(current.left != null && current.right != null){
             uI.println(current.data); // Ask question
@@ -56,38 +54,44 @@ public class QuestionTree {
             totalGames++;
             gamesWon++;
         }else {
-            System.out.println("I lose. What is your object?");
-            theirAnswer += uI.nextLine();
-            System.out.println("Type a yes/no question to distinguish your item from computer:");
-            question += uI.nextLine();
-            System.out.println("And what is the answer for your object?");
-
-            String placeholder = current.data;
-            if (uI.nextBoolean()) {
-                current.left = new QTNode(theirAnswer);
-                current.right = new QTNode(placeholder);
-            } else {
-                current.right = new QTNode(theirAnswer);
-                current.left = new QTNode(placeholder);
-            }
-            current.data = question;
-            totalGames++;
+            learnedNode(current);
         }
     }
 
+    private void learnedNode(QTNode current){
+        String question = "Q: ";
+        String theirAnswer = "A: ";
+        String placeholder = current.data;
+
+        System.out.println("I lose. What is your object?");
+        theirAnswer += uI.nextLine();
+        System.out.println("Type a yes/no question to distinguish your item from computer:");
+        question += uI.nextLine();
+        System.out.println("And what is the answer for your object?");
+
+        if (uI.nextBoolean()) {
+            current.left = new QTNode(theirAnswer);
+            current.right = new QTNode(placeholder);
+        }
+        else {
+            current.right = new QTNode(theirAnswer);
+            current.left = new QTNode(placeholder);
+        }
+
+        current.data = question;
+        totalGames++;
+    }
+
     /*
-    In this method you should store the current tree state to an output file represented by the given PrintStream. In
-    this way your question tree can grow each time the user runs the program. (You don't save the number of games
-    played/won.) A tree is specified by a sequence of lines, one for each node. Each line must start with either Q: to
-    indicate a question node or A: to indicate an answer (a leaf). All characters after these first two should
-    represent the text for that node (the question or answer). The nodes should appear in the order produced by a
-    preorder traversal of the tree. For example, the two trees shown in the diagram and logs on the preceding pages
-    would be represented by the following contents:
+    Runs the preorder traversal of the binary tree.
      */
     public void save(PrintStream output){
         preOrder(root, output);
     }
 
+    /*
+    Preorder traversal of a binary tree.
+     */
     private void preOrder(QTNode root, PrintStream output){
         if (root == null){
             return;
@@ -98,11 +102,7 @@ public class QuestionTree {
     }
 
     /*
-    In this method you should replace the current tree by reading another tree from a file. Your method will be passed
-    a Scanner that reads from a file and should replace the current tree nodes with a new tree using the information in
-    the file. Assume the file exists and is in proper standard format. Read entire lines of input using calls on
-    Scanner's nextLine. (You don't load the number of games played/won, just the tree. Calling this method doesn't
-    change games played/won.)
+    Creates a binary tree from a preorder list.
      */
     public void load(Scanner input) {
         while (input.hasNextLine()){
@@ -110,9 +110,14 @@ public class QuestionTree {
         }
     }
 
+    /*
+    Make a new QTNode with the next line in the text document.
+    If it is a question call loadNode() left, then call loadNode() right, then return the node.
+     */
     private QTNode loadNode(Scanner input){
             String data = input.nextLine();
             QTNode nextNode = new QTNode(data);
+
             if (data.charAt(0) == 'Q') {
                 nextNode.left = loadNode(input);
                 nextNode.right = loadNode(input);
@@ -120,10 +125,7 @@ public class QuestionTree {
             return nextNode;
     }
 
-
     public int totalGames(){ return totalGames;}
 
-    public int gamesWon(){
-        return gamesWon;
-    }
+    public int gamesWon(){ return gamesWon;}
 }
